@@ -1,0 +1,109 @@
+from pathlib import Path
+from PIL import Image
+import zipfile, os
+
+base = Path("/mnt/data")
+img_src = base / "a_dark_cyberpunk_gaming_website_homepage_hero_pa.png"
+site_dir = base / "XGONER-Website"
+site_dir.mkdir(exist_ok=True)
+
+img_dest = site_dir / "xgoner-hero.png"
+Image.open(img_src).save(img_dest, format="PNG", optimize=True)
+
+html = r'''<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#08000f">
+<title>XGONER | دنیای گیمینگ</title>
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#07050d;color:#fff;font-family:Tahoma,Arial,sans-serif}
+header{height:76px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;gap:20px;background:#090610;border-bottom:2px solid #9d18ff;position:sticky;top:0;z-index:5}
+.logo{font-size:27px;font-weight:900;letter-spacing:3px;color:#d18aff;text-shadow:0 0 15px #a000ff}
+nav{display:flex;gap:26px}
+nav a{color:#eee;text-decoration:none;font-size:14px;transition:.2s}
+nav a:hover{color:#d46bff;text-shadow:0 0 10px #a000ff}
+.menu{display:none;background:none;border:1px solid #a52aff;color:white;border-radius:8px;padding:8px 12px}
+.hero{padding:22px 3% 10px}
+.hero img{display:block;width:100%;height:auto;max-height:78vh;object-fit:cover;object-position:center;border:1px solid #a22aff;border-radius:14px;box-shadow:0 0 30px #8500ff55}
+.actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding:28px 15px}
+.btn{display:inline-block;text-decoration:none;color:#fff;background:linear-gradient(100deg,#6810d8,#c000ff);padding:13px 24px;border-radius:9px;font-weight:bold;box-shadow:0 0 18px #a000ff66;transition:.2s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 0 26px #bd37ff}
+section{padding:48px 7%;text-align:center}
+h2{color:#d18aff;font-size:27px;text-shadow:0 0 12px #8200ff;margin-top:0}
+.about{max-width:850px;margin:auto;padding:28px;background:linear-gradient(135deg,#171022,#0b0712);border:1px solid #7822b5;border-radius:16px;box-shadow:0 0 24px #7100aa33}
+.about p{color:#ddd;line-height:2}
+.tagline{color:#c45aff;font-weight:bold;letter-spacing:2px}
+footer{text-align:center;padding:24px;color:#aaa;border-top:1px solid #69209a;background:#0b0712;font-size:13px}
+@media(max-width:650px){
+ header{height:auto;min-height:68px;padding:14px 5%;flex-wrap:wrap}
+ .menu{display:block}
+ nav{display:none;width:100%;flex-direction:column;gap:0;padding:8px 0}
+ nav.open{display:flex}
+ nav a{padding:12px;border-top:1px solid #281438}
+ .logo{font-size:22px}
+ .hero{padding:12px 2%}
+ .hero img{max-height:none;border-radius:8px}
+ section{padding:34px 5%}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">✕ XGONER</div>
+  <button class="menu" id="menuBtn" aria-label="باز کردن منو">☰ منو</button>
+  <nav id="nav">
+    <a href="#home">خانه</a>
+    <a href="#about">درباره ما</a>
+    <a href="#contact">ارتباط</a>
+  </nav>
+</header>
+
+<main>
+  <div class="hero" id="home">
+    <img src="xgoner-hero.png" alt="طرح گیمینگ بنفش و مشکی XGONER">
+  </div>
+
+  <div class="actions">
+    <a class="btn" href="#about">ورود به دنیای XGONER</a>
+    <a class="btn" href="#contact">ارتباط با ما</a>
+  </div>
+
+  <section id="about">
+    <div class="about">
+      <h2>درباره XGONER</h2>
+      <p>XGONER یک دنیای گیمینگ با حال‌وهوای نئونی، رقابت و هیجان است. آماده‌ای وارد بازی شوی؟</p>
+      <div class="tagline">GAME • PLAY • WIN</div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="about">
+      <h2>ارتباط</h2>
+      <p>به‌زودی راه‌های ارتباطی XGONER در این بخش قرار می‌گیرند.</p>
+    </div>
+  </section>
+</main>
+
+<footer>© 2026 XGONER — ALL RIGHTS RESERVED</footer>
+<script>
+const menuBtn=document.getElementById('menuBtn');
+const nav=document.getElementById('nav');
+menuBtn.addEventListener('click',()=>nav.classList.toggle('open'));
+nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('open')));
+</script>
+</body>
+</html>'''
+
+(site_dir / "index.html").write_text(html, encoding="utf-8")
+
+zip_path = base / "XGONER-Website.zip"
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    z.write(site_dir / "index.html", "XGONER-Website/index.html")
+    z.write(img_dest, "XGONER-Website/xgoner-hero.png")
+
+print(f"Created: {zip_path}")
+print(f"HTML: {site_dir / 'index.html'}")
